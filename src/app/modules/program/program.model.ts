@@ -11,6 +11,10 @@ const programSchema = new Schema<IProgram>(
       type: String,
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+    },
     accessType: {
       type: String,
       enum: ['basic', 'standard', 'premium'],
