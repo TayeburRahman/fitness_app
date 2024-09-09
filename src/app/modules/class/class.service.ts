@@ -10,7 +10,8 @@ import getVideoDurationInSeconds from 'get-video-duration';
 import { formatDuration } from '../../../utils/duration';
 import { IReqUser } from '../user/user.interface';
 import { WatchList } from '../watch-list/watch-list.model';
-
+import path from 'path';
+import fs from 'fs';
 const createClass = async (req: Request) => {
   const { ...classData } = req.body as IClass;
 
@@ -29,28 +30,15 @@ const createClass = async (req: Request) => {
     //@ts-ignore
     docFile = `/documents/${files.docs[0].filename}`;
   }
-  let video = undefined;
-  //@ts-ignore
-  if (files?.video) {
-    //@ts-ignore
-    video = `/videos/${files.video[0].filename}`;
-  }
-
-  if (!video) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'All file is required');
-  }
   //@ts-ignore
   classData.date = classData.date.split('T')[0];
   //@ts-ignore
-  const duration = await getVideoDurationInSeconds(`${files.video[0].path}`);
-  const formattedDuration = formatDuration(duration);
+
 
   const result = await Classes.create({
     ...classData,
     pdfFile,
     docFile,
-    video,
-    videoDuration: formattedDuration,
   });
   return result;
 };
@@ -112,16 +100,11 @@ const updateClass = async (req: Request) => {
   const { ...classData } = req.body;
 
   //@ts-ignore
-  const video = req.files?.video;
   //@ts-ignore
   const pdf = req.files?.pdf;
   //@ts-ignore
   const docs = req.files?.docs;
 
-  if (video) {
-    // classData.video = video[0].path;
-    classData.video = `/videos/${video[0].filename}`;
-  }
   if (pdf) {
     classData.pdfFile = `/documents/${pdf[0].filename}`;
   }
